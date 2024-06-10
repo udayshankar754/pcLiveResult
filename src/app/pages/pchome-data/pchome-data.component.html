@@ -1,0 +1,236 @@
+<main class="p-4 min-h-screen">
+    <div class="flex flex-auto ">
+        <p class="flex-auto">
+            <a>Live</a>
+            <button class="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 rounded-md">Parliament General Election - 2024</button>
+        </p>
+        <h2 class="flex-none text-amber-800 font-bold text-xl">ASSEMBLY ELECTION RESULTS - 2024</h2>
+    </div>
+
+    <div>
+        <div class="flex justify-center ">
+            <h1 class="bg-orange-500 text-white font-serif px-4 py-1 rounded-xl">KEY CANDIDATE</h1>
+        </div>
+        <div class="py-4">
+            <!-- carausel start -->
+            <div class="carousel-container relative" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+                <button (click)="prevSlide(); stopAutoSlide();" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1">Prev</button>
+                <div class="carousel-inner flex overflow-hidden">
+                  <div *ngFor="let slide of slides; let i = index" class="carousel-item flex-none w-1/4 px-4 h-2/5" [class.hidden]="!isSlideVisible(i)">
+                    <!-- Your card content here -->
+                    <div class="card border p-4">
+                        <h2 class="justify-center items-center align-middle">{{slide?.acName}}</h2>
+                        <hr/>
+                
+                        <div class="flex items-center p-2">
+                            <img [src]="slide.candidateImage" alt="{{slide.candidateName + 'Image Not Found'}}" class="h-32 object-cover mr-4">
+                            <div>
+                                <h2 class="text-lg font-bold">{{slide.candidateName}}</h2>
+                                <div class="flex items-center">
+                                    <img [src]="slide.partyImage" alt="{{slide.partyName + 'Image Not Found'}}" class="h-12 rounded-full mr-2"> 
+                                    <h2 class="text-lg font-bold">{{slide.partyName}}</h2>
+                                </div>                    
+                                <div class="flex items-center"> <!-- Add this div with items-center -->
+                                    <p class="px-3 rounded-xl bg-green-500 text-white" *ngIf="slide.status == 'Won'">{{slide.status}}</p>
+                                    <p class="px-3 rounded-xl bg-red-500 text-white " *ngIf="slide.status == 'Lost'">{{slide.status}}</p>
+                                </div>
+            
+                            </div>
+                        </div>
+                        
+                    </div>
+                  </div>
+                </div>
+                <button (click)="nextSlide(); stopAutoSlide();" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1">Next</button>
+              </div>            
+             <!-- carausel End -->
+        </div>
+    </div>
+
+    <div class="flex py-4">
+        <div class="flex-1">
+            <div class="flex flex-col">
+                <!-- <app-charts></app-charts> -->
+                 <!-- table View Start -->
+                                
+                <nz-table #basicTable [nzData]="tableData" nzShowPagination="false" nzBordered="true">
+                    <thead>
+                    <tr>
+                        <th>Party</th>
+                        <th>Lead</th>
+                        <th>Won</th>
+                        <th>Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let data of basicTable.data">
+                        <td >{{data.party}}</td>
+                        <td>{{data.lead}}</td>
+                        <td>{{data.won}}</td>
+                        <td>{{data.total}}</td>
+                    </tr>
+                    </tbody>
+                </nz-table>
+                 <!-- table View end -->
+
+            </div>
+        </div>
+        <div class="flex-1">
+            <iframe src="https://liveresults.indiastatelections.com/ae/AELiveMap3_eng?theme=live&year=2019&stateid=28" class="w-full h-full"></iframe>
+        </div>
+    </div>
+
+    <div>
+        <!-- Candidte Table Start -->
+        <form nz-form [formGroup]="formData" class="flex flex-row justify-evenly">
+            <nz-form-item class="flex-grow-1 gap-4">
+                <nz-form-label [nzSpan]="6" nzFor="state"><span class="nz_label">Select State</span></nz-form-label>
+                <nz-form-control [nzSpan]="18">
+                    <nz-select formControlName="state" id="state" nzPlaceHolder="Select state"
+                               (ngModelChange)="onStateChange()" nzShowSearch nzAllowClear [style.width.px]="200" >
+                        <nz-option nzValue="" nzLabel="Select" nzDisabled>Select</nz-option>
+                        <nz-option *ngFor="let state of states" [nzValue]="state?.State_Name"
+                                   [nzLabel]="state?.State_Name"></nz-option>
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item class="flex-grow-0 gap-4" *ngIf="formData.get('state').value">
+                <nz-form-label [nzSpan]="6" nzFor="ac"><span class="nz_label">Select Ac</span></nz-form-label>
+                <nz-form-control [nzSpan]="18">
+                    <nz-select formControlName="ac" id="ac" nzPlaceHolder="Select state"
+                               (ngModelChange)="onAcChange()" nzShowSearch nzAllowClear [style.width.px]="200" >
+                        <nz-option nzValue="" nzLabel="Select" nzDisabled>Select</nz-option>
+                        <nz-option *ngFor="let ac of acData" [nzValue]="ac.acno"
+                                   [nzLabel]="ac.ac"></nz-option>
+                    </nz-select>
+                </nz-form-control>
+            </nz-form-item>
+        </form>
+        
+        <div class="flex">
+        
+            <div class="flex-1">
+                <h1 class="text-center text-amber-800 font-bold text-xl">CONTESTING CANDIDATES (2024)</h1>
+                <nz-table #nestedTable [nzData]="listOfParentData" nzShowPagination="false">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Candidate</th>
+                      <th>Party</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <ng-template ngFor let-data [ngForOf]="nestedTable.data">
+                      <tr>
+                        <td [(nzExpand)]="data.expand"></td>
+                        <td>
+                          <div class="flex items-center">
+                              <img [src]="data.photo" alt="{{data.candidate + ' Image Not Found'}}" class="h-16 rounded-full mx-4">
+                              <p>{{ data.candidate }}</p>
+                            </div>
+                        </td>
+                        <td>
+                          <div class="flex items-center">
+                              <p>{{ data.party }}</p>
+                              <img [src]="data.plogo" alt="{{data.party + ' Image Not Found'}}" class="h-12 rounded-full mx-4">
+                            </div>
+                        </td>
+                      </tr>
+                      <tr [nzExpand]="data.expand">
+                        <nz-table #innerTable [nzData]="getsubTableData(data)" nzSize="middle" [nzShowPagination]="false">
+                          <tbody>
+                              <ng-container *ngFor="let item of innerTable.data">
+                                  <tr >
+                                      <td>
+                                          Age
+                                      </td>
+                                      <td>
+                                          {{item.age}}
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td>
+                                          Gender
+                                      </td>
+                                      <td>
+                                          {{item.gender}}
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td>
+                                          Education
+                                      </td>
+                                      <td>
+                                          {{item.education}}
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td>
+                                          Assets (in Rs.)
+                                      </td>
+                                      <td>
+                                          {{item.totalassets}}
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td>
+                                          Criminal Cases
+                                      </td>
+                                      <td>
+                                          {{item.crimecases}}
+                                      </td>
+                                    </tr>
+                              </ng-container>
+                          </tbody>
+                        </nz-table>
+                      </tr>
+                    </ng-template>
+                  </tbody>
+                </nz-table>
+              </div>
+              
+              <div class="flex-1">
+                <h1 class="text-center text-amber-800 font-bold text-xl">ASSEMBLY-WISE RESULT (2024)</h1>
+                <div *ngIf="resultData" class="flex items-center justify-evenly">
+                  <ng-container *ngFor="let res of resultData">       
+                      <div>
+                          <h1 class="text-center bg-green-500 text-white p-2 ">Winner</h1>
+                          <div class="flex items-center">
+                              <img [src]="res.winnerPhoto" alt="{{res.Winner +'Image Not Found'}}" class="h-24 rounded-full mx-4">
+                              <div>
+                                  <p>{{ res.Winner}}</p>
+                                  <div class="flex items-center">
+                                      <img [src]="res.winplogo" alt="{{res.Winp +'Image Not Found'}}" class="h-12 rounded-full mx-4">
+                                      <p>{{ res.Winp }}</p>
+                                  </div>
+                                  
+                                  <p>{{res.WIN_VOTE}} ({{res.Winner_Votes_per}}) %</p>
+                              </div>
+                          </div>
+                      </div>
+                      <div >
+                          <h1 class="text-center bg-red-500 text-white p-2 ">Runner - UP</h1>
+                          <div class="flex items-center" >
+                              <img [src]="res.runnerPhoto" alt="{{res.Winner +'Image Not Found'}}" class="h-24 rounded-full mx-4">
+                              <div>
+                                  <p>{{ res.Runner}}</p>
+                                  <div class="flex items-center">
+                                      <img [src]="res.runplogo" alt="{{res.Runp +'Image Not Found'}}" class="h-12 rounded-full mx-4">
+                                      <p>{{ res.Runp }}</p>
+                                  </div>
+                                  <p>{{res.RUN_VOTE}} ({{res.Runner_Votes_per}}) %</p>
+                              </div>
+                          </div>    
+                      </div>
+                  </ng-container>
+                </div>
+              </div>
+        </div>
+        
+        
+         <!-- Candidate Table End -->
+        
+    </div>
+    
+
+</main>
